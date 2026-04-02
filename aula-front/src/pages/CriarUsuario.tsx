@@ -4,20 +4,26 @@ import api from '../config/api'
 export default function CriarUsuario() {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [sucesso, setSucesso] = useState('')
   const [erro, setErro] = useState('')
   const [mostrarSenha, setMostrarSenha] = useState(false)
+  const [erros, setErros] = useState<{email?: string, senha?: string}>({})
+  const isAdmin = localStorage.getItem('role') === 'admin'
+  const modoFuncionario = localStorage.getItem('modoFuncionario') === 'true'
 
   const criar = async () => {
+    const novosErros: {email?: string, senha?: string} = {}
+    if (!email.trim()) novosErros.email = 'Email é obrigatório'
+    if (!senha.trim()) novosErros.senha = 'Senha é obrigatória'
+    if (Object.keys(novosErros).length > 0) {
+      setErros(novosErros)
+      return
+    }
+    setErros({})
     try {
       await api.post('/auth/register', { email, senha })
-      setSucesso('Usuário criado com sucesso!')
-      setErro('')
-      setEmail('')
-      setSenha('')
+      window.location.href = '/usuarios'
     } catch {
-      setErro('Erro ao criar usuário')
-      setSucesso('')
+      setErro('Erro ao criar usuário — email já cadastrado?')
     }
   }
 
@@ -31,16 +37,41 @@ export default function CriarUsuario() {
             <span style={{ color: '#c8833b', fontSize: '22px', fontWeight: 'bold' }}>Byte</span>
           </div>
           <p style={{ color: '#a07850', fontSize: '12px' }}>Sistema de Gestão</p>
+          {isAdmin && (
+            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px', fontWeight: '600' }}>
+              {modoFuncionario ? '👁️ Modo Funcionário' : '⭐ Admin'}
+            </span>
+          )}
         </div>
         <a href="/produtos" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500' }}>
           🧾 Produtos
         </a>
-        <a href="/usuarios" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
-          👤 Usuários
-        </a>
-        <a href="/historico" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
-          📋 Histórico
-        </a>
+        {isAdmin && !modoFuncionario && (
+          <a href="/usuarios" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
+            👤 Usuários
+          </a>
+        )}
+        {isAdmin && !modoFuncionario && (
+          <a href="/historico" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
+            📋 Histórico
+          </a>
+        )}
+        {isAdmin && !modoFuncionario && (
+          <button
+            onClick={() => { localStorage.setItem('modoFuncionario', 'true'); window.location.href = '/produtos' }}
+            style={{ color: '#a07850', background: 'none', border: '1px solid #a07850', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}
+          >
+            👁️ Ver como funcionário
+          </button>
+        )}
+        {isAdmin && modoFuncionario && (
+          <button
+            onClick={() => { localStorage.removeItem('modoFuncionario'); window.location.href = '/produtos' }}
+            style={{ color: '#f5c97a', background: '#3d2510', border: 'none', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}
+          >
+            ← Sair da visualização
+          </button>
+        )}
         <div style={{ marginTop: 'auto' }}>
           <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('role'); window.location.href = '/' }} style={{ color: '#a07850', background: 'none', border: 'none', cursor: 'pointer' }}>
             → Sair
@@ -55,22 +86,22 @@ export default function CriarUsuario() {
           <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2c1a0e', marginBottom: '32px' }}>
             Criar Usuário
           </h2>
-          {sucesso && <p style={{ color: '#27ae60', fontSize: '14px', marginBottom: '16px' }}>{sucesso}</p>}
-          {erro && <p style={{ color: '#c0392b', fontSize: '14px', marginBottom: '16px' }}>{erro}</p>}
+          {erro && <p style={{ color: '#c0392b', fontSize: '14px', marginBottom: '16px', background: '#fff0f0', padding: '12px', borderRadius: '8px' }}>{erro}</p>}
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Email</label>
             <input
-              style={{ width: '100%', border: '1px solid #c8833b', borderRadius: '8px', padding: '12px', fontSize: '14px', boxSizing: 'border-box' }}
+              style={{ width: '100%', border: `1px solid ${erros.email ? '#c0392b' : '#c8833b'}`, borderRadius: '8px', padding: '12px', fontSize: '14px', boxSizing: 'border-box' }}
               placeholder="funcionario@graoebyte.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+            {erros.email && <p style={{ color: '#c0392b', fontSize: '12px', marginTop: '4px' }}>{erros.email}</p>}
           </div>
           <div style={{ marginBottom: '32px' }}>
             <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Senha</label>
             <div style={{ position: 'relative' }}>
               <input
-                style={{ width: '100%', border: '1px solid #c8833b', borderRadius: '8px', padding: '12px', paddingRight: '48px', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', border: `1px solid ${erros.senha ? '#c0392b' : '#c8833b'}`, borderRadius: '8px', padding: '12px', paddingRight: '48px', fontSize: '14px', boxSizing: 'border-box' }}
                 placeholder="••••••••"
                 type={mostrarSenha ? 'text' : 'password'}
                 value={senha}
@@ -83,6 +114,7 @@ export default function CriarUsuario() {
                 {mostrarSenha ? '🙈' : '👁️'}
               </button>
             </div>
+            {erros.senha && <p style={{ color: '#c0392b', fontSize: '12px', marginTop: '4px' }}>{erros.senha}</p>}
           </div>
           <button
             onClick={criar}
