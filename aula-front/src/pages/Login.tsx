@@ -6,15 +6,16 @@ export default function Login() {
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
 
-  const handleLogin = async () => {
-    try {
-      const res = await api.post('/auth/login', { email, senha })
-      localStorage.setItem('token', res.data.token)
-      window.location.href = '/produtos'
-    } catch {
-      setErro('Email ou senha incorretos')
-    }
+ const handleLogin = async () => {
+  try {
+    const res = await api.post('/auth/login', { email, senha })
+    localStorage.setItem('token', res.data.token)
+    localStorage.setItem('role', res.data.role)
+    window.location.href = '/produtos'
+  } catch {
+    setErro('Email ou senha incorretos')
   }
+}
 
   return (
     <div style={{ minHeight: '100vh', background: '#2c1a0e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

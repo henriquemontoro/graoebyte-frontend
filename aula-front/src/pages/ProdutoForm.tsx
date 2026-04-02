@@ -5,6 +5,7 @@ export default function ProdutoForm() {
   const [nome, setNome] = useState('')
   const [descricao, setDescricao] = useState('')
   const [preco, setPreco] = useState('')
+  const [categoria, setCategoria] = useState('Bebidas Quentes')
 
   const id = window.location.pathname.split('/')[2]
   const editando = id !== 'novo'
@@ -15,18 +16,21 @@ export default function ProdutoForm() {
         setNome(res.data.nome)
         setDescricao(res.data.descricao)
         setPreco(res.data.preco)
+        setCategoria(res.data.categoria || 'Bebidas Quentes')
       })
     }
   }, [])
 
   const salvar = async () => {
     if (editando) {
-      await api.put(`/produtos/${id}`, { nome, descricao, preco: Number(preco) })
+      await api.put(`/produtos/${id}`, { nome, descricao, preco: Number(preco), categoria })
     } else {
-      await api.post('/produtos', { nome, descricao, preco: Number(preco) })
+      await api.post('/produtos', { nome, descricao, preco: Number(preco), categoria })
     }
     window.location.href = '/produtos'
   }
+
+  const categorias = ['Bebidas Quentes', 'Bebidas Frias', 'Lanches', 'Doces', 'Outros']
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', background: '#fdf6ee' }}>
@@ -42,8 +46,18 @@ export default function ProdutoForm() {
         <a href="/produtos" style={{ background: '#3d2510', color: '#f5c97a', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500' }}>
           🧾 Produtos
         </a>
+        {localStorage.getItem('role') === 'admin' && (
+          <a href="/usuarios" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
+            👤 Usuários
+          </a>
+        )}
+        {localStorage.getItem('role') === 'admin' && (
+          <a href="/historico" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
+            📋 Histórico
+          </a>
+        )}
         <div style={{ marginTop: 'auto' }}>
-          <button onClick={() => { localStorage.removeItem('token'); window.location.href = '/' }} style={{ color: '#a07850', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('role'); window.location.href = '/' }} style={{ color: '#a07850', background: 'none', border: 'none', cursor: 'pointer' }}>
             → Sair
           </button>
         </div>
@@ -74,12 +88,25 @@ export default function ProdutoForm() {
               onChange={(e) => setDescricao(e.target.value)}
             />
           </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Categoria</label>
+            <select
+              style={{ width: '100%', border: '1px solid #c8833b', borderRadius: '8px', padding: '12px', fontSize: '14px', boxSizing: 'border-box', background: 'white', cursor: 'pointer' }}
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
+            >
+              {categorias.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
           <div style={{ marginBottom: '32px' }}>
             <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Preço (R$)</label>
             <input
-              style={{ width: '100%', border: '1px solid #c8833b', borderRadius: '8px', padding: '12px', fontSize: '14px', boxSizing: 'border-box' }}
+              style={{ width: '100%', border: '1px solid #c8833b', borderRadius: '8px', padding: '12px', fontSize: '14px', boxSizing: 'border-box', appearance: 'none' } as React.CSSProperties}
               placeholder="0,00"
               type="number"
+              step="0.01"
               value={preco}
               onChange={(e) => setPreco(e.target.value)}
             />
