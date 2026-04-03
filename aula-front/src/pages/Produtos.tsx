@@ -103,7 +103,7 @@ export default function Produtos() {
           </div>
           <p style={{ color: '#a07850', fontSize: '12px', marginBottom: '8px' }}>Sistema de Gestão</p>
           {isAdmin && (
-            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', border: 'none', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
+            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
               {modoFuncionario ? '👁️ Modo Funcionário' : 'Admin'}
             </span>
           )}
@@ -139,7 +139,7 @@ export default function Produtos() {
           </div>
           <a href="/produtos/novo" style={{ background: '#2c1a0e', color: '#f5c97a', padding: '12px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: '500', whiteSpace: 'nowrap' }}>+ Novo Produto</a>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '16px' }}>
           <div style={{ background: 'white', borderRadius: '12px', padding: '24px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #c8833b' }}>
             <p style={{ color: '#7a5c3a', fontSize: '12px', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total</p>
             <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#2c1a0e', margin: 0 }}>{produtos.length}</p>
@@ -157,6 +157,35 @@ export default function Produtos() {
             <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#c8833b', margin: 0 }}>R$ {precoMedio.toFixed(2)}</p>
           </div>
         </div>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+          {ordemCategorias.map(cat => {
+            const total = produtos.filter(p => p.categoria === cat).length
+            if (total === 0) return null
+            const disponiveis = produtos.filter(p => p.categoria === cat && p.disponivel).length
+            const ativo = categoriaFiltro === cat
+            return (
+              <button
+                key={cat}
+                onClick={() => setCategoriaFiltro(ativo ? 'Todas' : cat)}
+                style={{
+                  background: ativo ? corCategoria(cat) : 'white',
+                  color: ativo ? 'white' : '#2c1a0e',
+                  border: `2px solid ${corCategoria(cat)}`,
+                  borderRadius: '12px',
+                  padding: '10px 16px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.15s'
+                }}
+              >
+                <div style={{ fontWeight: '600', fontSize: '13px' }}>{cat}</div>
+                <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '2px' }}>
+                  {disponiveis} de {total} disponíveis
+                </div>
+              </button>
+            )
+          })}
+        </div>
         <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', alignItems: 'center' }}>
           <input
             style={{ flex: 1, border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', boxSizing: 'border-box', background: 'white', height: '46px' }}
@@ -164,14 +193,6 @@ export default function Produtos() {
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
-          <select style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', background: 'white', cursor: 'pointer', height: '46px' }} value={categoriaFiltro} onChange={(e) => setCategoriaFiltro(e.target.value)}>
-            <option value="Todas">Categoria: Todas</option>
-            <option value="Bebidas Quentes">Bebidas Quentes</option>
-            <option value="Bebidas Frias">Bebidas Frias</option>
-            <option value="Lanches">Lanches</option>
-            <option value="Doces">Doces</option>
-            <option value="Outros">Outros</option>
-          </select>
           <select style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', background: 'white', cursor: 'pointer', height: '46px' }} value={disponivelFiltro} onChange={(e) => setDisponivelFiltro(e.target.value)}>
             <option value="Todos">Disponibilidade: Todas</option>
             <option value="Disponíveis">Disponíveis</option>

@@ -7,6 +7,7 @@ export default function ProdutoForm() {
   const [preco, setPreco] = useState('')
   const [categoria, setCategoria] = useState('Bebidas Quentes')
   const [erros, setErros] = useState<{nome?: string, descricao?: string, preco?: string}>({})
+  const [erroGeral, setErroGeral] = useState('')
   const isAdmin = localStorage.getItem('role') === 'admin'
   const modoFuncionario = localStorage.getItem('modoFuncionario') === 'true'
 
@@ -34,12 +35,17 @@ export default function ProdutoForm() {
       return
     }
     setErros({})
-    if (editando) {
-      await api.put(`/produtos/${id}`, { nome, descricao, preco: Number(preco), categoria })
-    } else {
-      await api.post('/produtos', { nome, descricao, preco: Number(preco), categoria })
+    setErroGeral('')
+    try {
+      if (editando) {
+        await api.put(`/produtos/${id}`, { nome, descricao, preco: Number(preco), categoria })
+      } else {
+        await api.post('/produtos', { nome, descricao, preco: Number(preco), categoria })
+      }
+      window.location.href = '/produtos'
+    } catch (e: any) {
+      setErroGeral(e.response?.data?.message || 'Erro ao salvar produto')
     }
-    window.location.href = '/produtos'
   }
 
   const categorias = ['Bebidas Quentes', 'Bebidas Frias', 'Lanches', 'Doces', 'Outros']
@@ -55,7 +61,7 @@ export default function ProdutoForm() {
           </div>
           <p style={{ color: '#a07850', fontSize: '12px', marginBottom: '8px' }}>Sistema de Gestão</p>
           {isAdmin && (
-            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', border: 'none', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
+            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
               {modoFuncionario ? '👁️ Modo Funcionário' : 'Admin'}
             </span>
           )}
@@ -89,6 +95,7 @@ export default function ProdutoForm() {
           <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2c1a0e', marginBottom: '32px' }}>
             {editando ? 'Editar Produto' : 'Novo Produto'}
           </h2>
+          {erroGeral && <p style={{ color: '#c0392b', fontSize: '14px', marginBottom: '16px', background: '#fff0f0', padding: '12px', borderRadius: '8px' }}>{erroGeral}</p>}
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Nome</label>
             <input

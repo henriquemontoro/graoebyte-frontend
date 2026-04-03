@@ -31,6 +31,7 @@ export default function App() {
         <Route path="/produtos/:id/editar" element={<RotaProtegida><ProdutoForm /></RotaProtegida>} />
         <Route path="/usuarios" element={<RotaAdmin><Usuarios /></RotaAdmin>} />
         <Route path="/usuarios/novo" element={<RotaAdmin><CriarUsuario /></RotaAdmin>} />
+        <Route path="/usuarios/:id/editar" element={<RotaAdmin><CriarUsuario /></RotaAdmin>} />
         <Route path="/historico" element={<RotaAdmin><Historico /></RotaAdmin>} />
       </Routes>
     </BrowserRouter>

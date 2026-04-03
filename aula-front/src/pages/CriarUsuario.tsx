@@ -1,26 +1,45 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from '../config/api'
 
 export default function CriarUsuario() {
+  const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [mostrarSenha, setMostrarSenha] = useState(false)
-  const [erros, setErros] = useState<{email?: string, senha?: string}>({})
+  const [erros, setErros] = useState<{nome?: string, email?: string, senha?: string}>({})
   const isAdmin = localStorage.getItem('role') === 'admin'
   const modoFuncionario = localStorage.getItem('modoFuncionario') === 'true'
 
-  const criar = async () => {
-    const novosErros: {email?: string, senha?: string} = {}
+  const id = window.location.pathname.split('/')[2]
+  const editando = id !== 'novo'
+
+  useEffect(() => {
+    if (editando) {
+      api.get(`/usuarios/${id}`).then((res) => {
+        setNome(res.data.nome)
+        setEmail(res.data.email)
+      })
+    }
+  }, [])
+
+  const validarSenha = (s: string) => {
+    const errosSenha = []
+    if (s.length < 8) errosSenha.push('mínimo 8 caracteres')
+    if (!/[A-Z]/.test(s)) errosSenha.push('1 letra maiúscula')
+    if (!/[0-9]/.test(s)) errosSenha.push('1 número')
+    if (!/[^A-Za-z0-9]/.test(s)) errosSenha.push('1 símbolo')
+    return errosSenha
+  }
+
+  const salvar = async () => {
+    const novosErros: {nome?: string, email?: string, senha?: string} = {}
+    if (!nome.trim()) novosErros.nome = 'Nome é obrigatório'
     if (!email.trim()) novosErros.email = 'Email é obrigatório'
-    if (!senha.trim()) {
+    if (!editando && !senha.trim()) {
       novosErros.senha = 'Senha é obrigatória'
-    } else {
-      const errosSenha = []
-      if (senha.length < 8) errosSenha.push('mínimo 8 caracteres')
-      if (!/[A-Z]/.test(senha)) errosSenha.push('1 letra maiúscula')
-      if (!/[0-9]/.test(senha)) errosSenha.push('1 número')
-      if (!/[^A-Za-z0-9]/.test(senha)) errosSenha.push('1 símbolo')
+    } else if (senha.trim()) {
+      const errosSenha = validarSenha(senha)
       if (errosSenha.length > 0) novosErros.senha = `Senha deve ter: ${errosSenha.join(', ')}`
     }
     if (Object.keys(novosErros).length > 0) {
@@ -28,11 +47,18 @@ export default function CriarUsuario() {
       return
     }
     setErros({})
+    setErro('')
     try {
-      await api.post('/auth/register', { email, senha })
+      if (editando) {
+        const update: Record<string, string> = { nome, email }
+        if (senha.trim()) update.senha = senha
+        await api.put(`/usuarios/${id}`, update)
+      } else {
+        await api.post('/auth/register', { nome, email, senha })
+      }
       window.location.href = '/usuarios'
-    } catch {
-      setErro('Erro ao criar usuário — email já cadastrado?')
+    } catch (e: any) {
+      setErro(e.response?.data?.message || (editando ? 'Erro ao editar usuário' : 'Erro ao criar usuário'))
     }
   }
 
@@ -47,7 +73,7 @@ export default function CriarUsuario() {
           </div>
           <p style={{ color: '#a07850', fontSize: '12px', marginBottom: '8px' }}>Sistema de Gestão</p>
           {isAdmin && (
-            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', border: 'none', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
+            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
               {modoFuncionario ? '👁️ Modo Funcionário' : 'Admin'}
             </span>
           )}
@@ -78,8 +104,20 @@ export default function CriarUsuario() {
       <main style={{ flex: 1, padding: '48px', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
         <div style={{ background: 'white', borderRadius: '20px', padding: '40px', width: '100%', maxWidth: '500px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
           <a href="/usuarios" style={{ color: '#7a5c3a', fontSize: '14px', textDecoration: 'none', display: 'block', marginBottom: '24px' }}>← Voltar</a>
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2c1a0e', marginBottom: '32px' }}>Criar Usuário</h2>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2c1a0e', marginBottom: '32px' }}>
+            {editando ? 'Editar Usuário' : 'Criar Usuário'}
+          </h2>
           {erro && <p style={{ color: '#c0392b', fontSize: '14px', marginBottom: '16px', background: '#fff0f0', padding: '12px', borderRadius: '8px' }}>{erro}</p>}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Nome</label>
+            <input
+              style={{ width: '100%', border: `1px solid ${erros.nome ? '#c0392b' : '#c8833b'}`, borderRadius: '8px', padding: '12px', fontSize: '14px', boxSizing: 'border-box' }}
+              placeholder="João Silva"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+            />
+            {erros.nome && <p style={{ color: '#c0392b', fontSize: '12px', marginTop: '4px' }}>{erros.nome}</p>}
+          </div>
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Email</label>
             <input
@@ -91,7 +129,9 @@ export default function CriarUsuario() {
             {erros.email && <p style={{ color: '#c0392b', fontSize: '12px', marginTop: '4px' }}>{erros.email}</p>}
           </div>
           <div style={{ marginBottom: '32px' }}>
-            <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Senha</label>
+            <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>
+              {editando ? 'Nova Senha (opcional)' : 'Senha'}
+            </label>
             <div style={{ position: 'relative' }}>
               <input
                 style={{ width: '100%', border: `1px solid ${erros.senha ? '#c0392b' : '#c8833b'}`, borderRadius: '8px', padding: '12px', paddingRight: '48px', fontSize: '14px', boxSizing: 'border-box' }}
@@ -106,8 +146,8 @@ export default function CriarUsuario() {
             </div>
             {erros.senha && <p style={{ color: '#c0392b', fontSize: '12px', marginTop: '4px' }}>{erros.senha}</p>}
           </div>
-          <button onClick={criar} style={{ width: '100%', background: '#2c1a0e', color: '#f5c97a', padding: '14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>
-            Criar Usuário
+          <button onClick={salvar} style={{ width: '100%', background: '#2c1a0e', color: '#f5c97a', padding: '14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>
+            {editando ? 'Salvar Alterações' : 'Criar Usuário'}
           </button>
         </div>
       </main>

@@ -3,6 +3,7 @@ import api from '../config/api'
 
 interface Usuario {
   _id: string
+  nome: string
   email: string
   role: string
 }
@@ -14,9 +15,7 @@ export default function Usuarios() {
   const isAdmin = localStorage.getItem('role') === 'admin'
   const modoFuncionario = localStorage.getItem('modoFuncionario') === 'true'
 
-  if (modoFuncionario) {
-    window.location.href = '/produtos'
-  }
+  if (modoFuncionario) window.location.href = '/produtos'
 
   const fetchUsuarios = async () => {
     const res = await api.get('/usuarios')
@@ -52,7 +51,7 @@ export default function Usuarios() {
           </div>
           <p style={{ color: '#a07850', fontSize: '12px', marginBottom: '8px' }}>Sistema de Gestão</p>
           {isAdmin && (
-            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', border: 'none', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
+            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
               {modoFuncionario ? '👁️ Modo Funcionário' : 'Admin'}
             </span>
           )}
@@ -93,16 +92,20 @@ export default function Usuarios() {
           {usuarios.map((u) => (
             <div key={u._id} style={{ background: 'white', borderLeft: '4px solid #c8833b', borderRadius: '12px', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
               <div>
-                <h3 style={{ fontWeight: 'bold', fontSize: '16px', color: '#2c1a0e' }}>{u.email}</h3>
-                <span style={{ fontSize: '12px', background: u.role === 'admin' ? '#f0d080' : '#e8e8e8', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px' }}>
+                <h3 style={{ fontWeight: 'bold', fontSize: '16px', color: '#2c1a0e', margin: '0 0 4px' }}>{u.nome}</h3>
+                <p style={{ color: '#7a5c3a', fontSize: '13px', margin: '0 0 6px' }}>{u.email}</p>
+                <span style={{ fontSize: '12px', background: u.role === 'admin' ? '#f5c97a' : '#e8e8e8', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px' }}>
                   {u.role}
                 </span>
               </div>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <select value={u.role} onChange={(e) => alterarRole(u._id, e.target.value)} style={{ border: '1px solid #c8833b', borderRadius: '8px', padding: '8px', fontSize: '14px', cursor: 'pointer' }}>
                   <option value="funcionario">Funcionário</option>
                   <option value="admin">Admin</option>
                 </select>
+                <a href={`/usuarios/${u._id}/editar`} style={{ background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontSize: '14px' }}>
+                  Editar
+                </a>
                 <button onClick={() => setConfirmarDeletar(u._id)} style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>
                   Deletar
                 </button>

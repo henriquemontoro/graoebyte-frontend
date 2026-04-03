@@ -12,6 +12,7 @@ export default function Login() {
       const res = await api.post('/auth/login', { email, senha })
       localStorage.setItem('token', res.data.token)
       localStorage.setItem('role', res.data.role)
+      localStorage.setItem('nome', res.data.nome || res.data.email)
       localStorage.removeItem('modoFuncionario')
       window.location.href = '/produtos'
     } catch {
