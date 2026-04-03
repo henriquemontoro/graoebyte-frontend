@@ -25,6 +25,17 @@ export default function Produtos() {
   const categorias = ['Todas', 'Bebidas Quentes', 'Bebidas Frias', 'Lanches', 'Doces', 'Outros']
   const ordemCategorias = ['Bebidas Quentes', 'Bebidas Frias', 'Lanches', 'Doces', 'Outros']
 
+  const corCategoria = (categoria: string) => {
+    const cores: {[key: string]: string} = {
+      'Bebidas Quentes': '#c8833b',
+      'Bebidas Frias': '#a07850',
+      'Lanches': '#8a6340',
+      'Doces': '#d4a96a',
+      'Outros': '#7a5c3a'
+    }
+    return cores[categoria] || '#7a5c3a'
+  }
+
   const fetchProdutos = async () => {
     const res = await api.get('/produtos')
     setProdutos(res.data)
@@ -90,9 +101,9 @@ export default function Produtos() {
             <span style={{ color: 'white', fontSize: '22px', fontWeight: 'bold' }}> & </span>
             <span style={{ color: '#c8833b', fontSize: '22px', fontWeight: 'bold' }}>Byte</span>
           </div>
-          <p style={{ color: '#a07850', fontSize: '12px' }}>Sistema de Gestão</p>
+          <p style={{ color: '#a07850', fontSize: '12px', marginBottom: '8px' }}>Sistema de Gestão</p>
           {isAdmin && (
-            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px', fontWeight: '600' }}>
+            <span style={{ fontSize: '11px', background: '#f0d080', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
               {modoFuncionario ? '👁️ Modo Funcionário' : '⭐ Admin'}
             </span>
           )}
@@ -129,64 +140,52 @@ export default function Produtos() {
           <a href="/produtos/novo" style={{ background: '#2c1a0e', color: '#f5c97a', padding: '12px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: '500', whiteSpace: 'nowrap' }}>+ Novo Produto</a>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #c8833b' }}>
+          <div style={{ background: 'white', borderRadius: '12px', padding: '24px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #c8833b' }}>
             <p style={{ color: '#7a5c3a', fontSize: '12px', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total</p>
             <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#2c1a0e', margin: 0 }}>{produtos.length}</p>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #28a745' }}>
+          <div style={{ background: 'white', borderRadius: '12px', padding: '24px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #28a745' }}>
             <p style={{ color: '#7a5c3a', fontSize: '12px', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Disponíveis</p>
             <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#28a745', margin: 0 }}>{totalDisponiveis}</p>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #dc3545' }}>
+          <div style={{ background: 'white', borderRadius: '12px', padding: '24px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #dc3545' }}>
             <p style={{ color: '#7a5c3a', fontSize: '12px', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Indisponíveis</p>
             <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#dc3545', margin: 0 }}>{totalIndisponiveis}</p>
           </div>
-          <div style={{ background: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #f5c97a' }}>
+          <div style={{ background: 'white', borderRadius: '12px', padding: '24px 20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #f5c97a' }}>
             <p style={{ color: '#7a5c3a', fontSize: '12px', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Preço Médio</p>
             <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#c8833b', margin: 0 }}>R$ {precoMedio.toFixed(2)}</p>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', alignItems: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', alignItems: 'center' }}>
           <input
-            style={{ flex: 1, border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', boxSizing: 'border-box', background: 'white', height: '44px' }}
+            style={{ flex: 1, border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', boxSizing: 'border-box', background: 'white', height: '46px' }}
             placeholder="🔍 Buscar produto..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '10px', color: '#a07850', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Categoria</label>
-            <select
-              style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', background: 'white', cursor: 'pointer', height: '44px' }}
-              value={categoriaFiltro}
-              onChange={(e) => setCategoriaFiltro(e.target.value)}
-            >
-              {categorias.map((c) => (<option key={c} value={c}>{c}</option>))}
-            </select>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '10px', color: '#a07850', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Disponibilidade</label>
-            <select
-              style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', background: 'white', cursor: 'pointer', height: '44px' }}
-              value={disponivelFiltro}
-              onChange={(e) => setDisponivelFiltro(e.target.value)}
-            >
-              <option value="Todos">Todos</option>
-              <option value="Disponíveis">Disponíveis</option>
-              <option value="Indisponíveis">Indisponíveis</option>
-            </select>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <label style={{ fontSize: '10px', color: '#a07850', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Visualização</label>
-            <div style={{ display: 'flex', border: '1px solid #c8833b', borderRadius: '10px', overflow: 'hidden', height: '44px' }}>
-              <button onClick={() => setView('cards')} style={{ padding: '0 16px', background: view === 'cards' ? '#2c1a0e' : 'white', color: view === 'cards' ? '#f5c97a' : '#2c1a0e', border: 'none', cursor: 'pointer', fontSize: '16px' }}>⊞</button>
-              <button onClick={() => setView('tabela')} style={{ padding: '0 16px', background: view === 'tabela' ? '#2c1a0e' : 'white', color: view === 'tabela' ? '#f5c97a' : '#2c1a0e', border: 'none', cursor: 'pointer', fontSize: '16px' }}>☰</button>
-            </div>
+          <select style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', background: 'white', cursor: 'pointer', height: '46px' }} value={categoriaFiltro} onChange={(e) => setCategoriaFiltro(e.target.value)}>
+            <option value="Todas">Categoria: Todas</option>
+            <option value="Bebidas Quentes">Bebidas Quentes</option>
+            <option value="Bebidas Frias">Bebidas Frias</option>
+            <option value="Lanches">Lanches</option>
+            <option value="Doces">Doces</option>
+            <option value="Outros">Outros</option>
+          </select>
+          <select style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', background: 'white', cursor: 'pointer', height: '46px' }} value={disponivelFiltro} onChange={(e) => setDisponivelFiltro(e.target.value)}>
+            <option value="Todos">Disponibilidade: Todas</option>
+            <option value="Disponíveis">Disponíveis</option>
+            <option value="Indisponíveis">Indisponíveis</option>
+          </select>
+          <div style={{ display: 'flex', border: '1px solid #c8833b', borderRadius: '10px', overflow: 'hidden', height: '46px' }}>
+            <button onClick={() => setView('cards')} style={{ padding: '0 16px', background: view === 'cards' ? '#2c1a0e' : 'white', color: view === 'cards' ? '#f5c97a' : '#2c1a0e', border: 'none', cursor: 'pointer', fontSize: '16px' }}>⊞</button>
+            <button onClick={() => setView('tabela')} style={{ padding: '0 16px', background: view === 'tabela' ? '#2c1a0e' : 'white', color: view === 'tabela' ? '#f5c97a' : '#2c1a0e', border: 'none', cursor: 'pointer', fontSize: '16px' }}>☰</button>
           </div>
         </div>
         {view === 'cards' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
             {produtosFiltrados.map((p) => (
-              <div key={p._id} style={{ background: 'white', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderTop: `4px solid ${p.disponivel ? '#c8833b' : '#ccc'}`, opacity: p.disponivel ? 1 : 0.7 }}>
+              <div key={p._id} style={{ background: 'white', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', borderTop: `4px solid ${p.disponivel ? corCategoria(p.categoria) : '#ccc'}`, opacity: p.disponivel ? 1 : 0.7 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                   <h3 style={{ fontWeight: 'bold', fontSize: '16px', color: '#2c1a0e', margin: 0 }}>{p.nome}</h3>
                   <span style={{ fontSize: '11px', background: p.disponivel ? '#d4edda' : '#f8d7da', color: p.disponivel ? '#155724' : '#721c24', padding: '2px 8px', borderRadius: '20px', fontWeight: '500', whiteSpace: 'nowrap', marginLeft: '8px' }}>
@@ -196,7 +195,7 @@ export default function Produtos() {
                 <p style={{ color: '#7a5c3a', fontSize: '13px', margin: '0 0 12px' }}>{p.descricao}</p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <span style={{ fontSize: '22px', fontWeight: 'bold', color: '#c8833b' }}>R$ {p.preco.toFixed(2)}</span>
-                  <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px', fontWeight: '500' }}>{p.categoria || 'Outros'}</span>
+                  <span style={{ fontSize: '11px', background: corCategoria(p.categoria), color: 'white', padding: '2px 8px', borderRadius: '20px', fontWeight: '500' }}>{p.categoria || 'Outros'}</span>
                 </div>
                 <p style={{ color: '#a07850', fontSize: '11px', margin: '0 0 12px' }}>Atualizado em {formatarData(p.updatedAt)}</p>
                 <div style={{ display: 'flex', gap: '8px' }}>
@@ -231,7 +230,7 @@ export default function Produtos() {
                       <p style={{ color: '#7a5c3a', margin: 0, fontSize: '12px' }}>{p.descricao}</p>
                     </td>
                     <td style={{ padding: '14px 16px', borderBottom: '1px solid #f0e8dc' }}>
-                      <span style={{ fontSize: '12px', background: '#f5c97a', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '500' }}>{p.categoria || 'Outros'}</span>
+                      <span style={{ fontSize: '12px', background: corCategoria(p.categoria), color: 'white', padding: '3px 10px', borderRadius: '20px', fontWeight: '500' }}>{p.categoria || 'Outros'}</span>
                     </td>
                     <td style={{ padding: '14px 16px', borderBottom: '1px solid #f0e8dc' }}>
                       <span style={{ fontWeight: 'bold', color: '#c8833b', fontSize: '16px' }}>R$ {p.preco.toFixed(2)}</span>

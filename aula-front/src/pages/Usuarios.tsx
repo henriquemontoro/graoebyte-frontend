@@ -50,44 +50,32 @@ export default function Usuarios() {
             <span style={{ color: 'white', fontSize: '22px', fontWeight: 'bold' }}> & </span>
             <span style={{ color: '#c8833b', fontSize: '22px', fontWeight: 'bold' }}>Byte</span>
           </div>
-          <p style={{ color: '#a07850', fontSize: '12px' }}>Sistema de Gestão</p>
+          <p style={{ color: '#a07850', fontSize: '12px', marginBottom: '8px' }}>Sistema de Gestão</p>
           {isAdmin && (
-            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px', fontWeight: '600' }}>
+            <span style={{ fontSize: '11px', background: '#f0d080', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
               {modoFuncionario ? '👁️ Modo Funcionário' : '⭐ Admin'}
             </span>
           )}
         </div>
-        <a href="/produtos" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500' }}>
-          🧾 Produtos
-        </a>
+        <a href="/produtos" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500' }}>🧾 Produtos</a>
         {isAdmin && !modoFuncionario && (
-          <a href="/usuarios" style={{ background: '#3d2510', color: '#f5c97a', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
-            👤 Usuários
-          </a>
+          <a href="/usuarios" style={{ background: '#3d2510', color: '#f5c97a', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>👤 Usuários</a>
         )}
         {isAdmin && !modoFuncionario && (
-          <a href="/historico" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
-            📋 Histórico
-          </a>
+          <a href="/historico" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>📋 Histórico</a>
         )}
         {isAdmin && !modoFuncionario && (
-          <button
-            onClick={() => { localStorage.setItem('modoFuncionario', 'true'); window.location.href = '/produtos' }}
-            style={{ color: '#a07850', background: 'none', border: '1px solid #a07850', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}
-          >
+          <button onClick={() => { localStorage.setItem('modoFuncionario', 'true'); window.location.href = '/produtos' }} style={{ color: '#a07850', background: 'none', border: '1px solid #a07850', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}>
             👁️ Ver como funcionário
           </button>
         )}
         {isAdmin && modoFuncionario && (
-          <button
-            onClick={() => { localStorage.removeItem('modoFuncionario'); window.location.href = '/produtos' }}
-            style={{ color: '#f5c97a', background: '#3d2510', border: 'none', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}
-          >
+          <button onClick={() => { localStorage.removeItem('modoFuncionario'); window.location.href = '/produtos' }} style={{ color: '#f5c97a', background: '#3d2510', border: 'none', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}>
             ← Sair da visualização
           </button>
         )}
         <div style={{ marginTop: 'auto' }}>
-          <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('role'); window.location.href = '/' }} style={{ color: '#a07850', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('role'); localStorage.removeItem('modoFuncionario'); window.location.href = '/' }} style={{ color: '#a07850', background: 'none', border: 'none', cursor: 'pointer' }}>
             → Sair
           </button>
         </div>
@@ -98,9 +86,7 @@ export default function Usuarios() {
             <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#2c1a0e' }}>Usuários</h2>
             <p style={{ color: '#7a5c3a' }}>{usuarios.length} usuários cadastrados</p>
           </div>
-          <a href="/usuarios/novo" style={{ background: '#2c1a0e', color: '#f5c97a', padding: '12px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: '500' }}>
-            + Novo Usuário
-          </a>
+          <a href="/usuarios/novo" style={{ background: '#2c1a0e', color: '#f5c97a', padding: '12px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: '500' }}>+ Novo Usuário</a>
         </div>
         {erro && <p style={{ color: '#c0392b', marginBottom: '16px', background: '#fff0f0', padding: '12px', borderRadius: '8px' }}>{erro}</p>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -108,23 +94,16 @@ export default function Usuarios() {
             <div key={u._id} style={{ background: 'white', borderLeft: '4px solid #c8833b', borderRadius: '12px', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
               <div>
                 <h3 style={{ fontWeight: 'bold', fontSize: '16px', color: '#2c1a0e' }}>{u.email}</h3>
-                <span style={{ fontSize: '12px', background: u.role === 'admin' ? '#f5c97a' : '#e8e8e8', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px' }}>
+                <span style={{ fontSize: '12px', background: u.role === 'admin' ? '#f0d080' : '#e8e8e8', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px' }}>
                   {u.role}
                 </span>
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <select
-                  value={u.role}
-                  onChange={(e) => alterarRole(u._id, e.target.value)}
-                  style={{ border: '1px solid #c8833b', borderRadius: '8px', padding: '8px', fontSize: '14px', cursor: 'pointer' }}
-                >
+                <select value={u.role} onChange={(e) => alterarRole(u._id, e.target.value)} style={{ border: '1px solid #c8833b', borderRadius: '8px', padding: '8px', fontSize: '14px', cursor: 'pointer' }}>
                   <option value="funcionario">Funcionário</option>
                   <option value="admin">Admin</option>
                 </select>
-                <button
-                  onClick={() => setConfirmarDeletar(u._id)}
-                  style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}
-                >
+                <button onClick={() => setConfirmarDeletar(u._id)} style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>
                   Deletar
                 </button>
               </div>
@@ -137,18 +116,8 @@ export default function Usuarios() {
               <h3 style={{ color: '#2c1a0e', fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>Deletar usuário?</h3>
               <p style={{ color: '#7a5c3a', marginBottom: '24px' }}>Essa ação não pode ser desfeita.</p>
               <div style={{ display: 'flex', gap: '12px' }}>
-                <button
-                  onClick={() => setConfirmarDeletar(null)}
-                  style={{ flex: 1, background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={() => deletar(confirmarDeletar)}
-                  style={{ flex: 1, background: '#c0392b', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}
-                >
-                  Deletar
-                </button>
+                <button onClick={() => setConfirmarDeletar(null)} style={{ flex: 1, background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}>Cancelar</button>
+                <button onClick={() => deletar(confirmarDeletar)} style={{ flex: 1, background: '#c0392b', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}>Deletar</button>
               </div>
             </div>
           </div>
