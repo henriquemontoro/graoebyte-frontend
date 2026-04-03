@@ -12,27 +12,19 @@ interface Log {
 export default function Historico() {
   const [logs, setLogs] = useState<Log[]>([])
   const isAdmin = localStorage.getItem('role') === 'admin'
-  const [modoFuncionario, setModoFuncionario] = useState(localStorage.getItem('modoFuncionario') === 'true')
+  const [confirmarLimpar, setConfirmarLimpar] = useState(false)
+  const modoFuncionario = localStorage.getItem('modoFuncionario') === 'true'
+
+  if (modoFuncionario) {
+    window.location.href = '/produtos'
+  }
+
   const fetchLogs = async () => {
     const res = await api.get('/logs')
     setLogs(res.data)
   }
-if (modoFuncionario) {
-  window.location.href = '/produtos'
-}
-  const limpar = async () => {
-    if (!confirm('Tem certeza que deseja limpar todo o histórico?')) return
-    await api.delete('/logs')
-    fetchLogs()
-  }
 
-  useEffect(() => {
-  if (modoFuncionario) {
-    window.location.href = '/produtos'
-    return
-  }
-  fetchLogs()
-}, [])
+  useEffect(() => { fetchLogs() }, [])
 
   const formatarData = (data: string) => {
     return new Date(data).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
@@ -50,37 +42,29 @@ if (modoFuncionario) {
           <p style={{ color: '#a07850', fontSize: '12px' }}>Sistema de Gestão</p>
           {isAdmin && (
             <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px', fontWeight: '600' }}>
-              {modoFuncionario ? '👁️ Modo Funcionário' : '⭐ Admin'}
+              ⭐ Admin
             </span>
           )}
         </div>
         <a href="/produtos" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500' }}>
           🧾 Produtos
         </a>
-        {isAdmin && !modoFuncionario && (
+        {isAdmin && (
           <a href="/usuarios" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
             👤 Usuários
           </a>
         )}
-        {isAdmin && !modoFuncionario && (
+        {isAdmin && (
           <a href="/historico" style={{ background: '#3d2510', color: '#f5c97a', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
             📋 Histórico
           </a>
         )}
-        {isAdmin && !modoFuncionario && (
+        {isAdmin && (
           <button
-            onClick={() => { localStorage.setItem('modoFuncionario', 'true'); setModoFuncionario(true) }}
+            onClick={() => { localStorage.setItem('modoFuncionario', 'true'); window.location.href = '/produtos' }}
             style={{ color: '#a07850', background: 'none', border: '1px solid #a07850', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}
           >
             👁️ Ver como funcionário
-          </button>
-        )}
-        {isAdmin && modoFuncionario && (
-          <button
-            onClick={() => { localStorage.removeItem('modoFuncionario'); setModoFuncionario(false) }}
-            style={{ color: '#f5c97a', background: '#3d2510', border: 'none', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}
-          >
-            ← Sair da visualização
           </button>
         )}
         <div style={{ marginTop: 'auto' }}>
@@ -96,7 +80,7 @@ if (modoFuncionario) {
             <p style={{ color: '#7a5c3a' }}>{logs.length} registros</p>
           </div>
           <button
-            onClick={limpar}
+            onClick={() => setConfirmarLimpar(true)}
             style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '12px 20px', borderRadius: '12px', cursor: 'pointer', fontWeight: '500' }}
           >
             🗑️ Limpar histórico
@@ -116,6 +100,28 @@ if (modoFuncionario) {
             </div>
           ))}
         </div>
+        {confirmarLimpar && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div style={{ background: 'white', borderRadius: '20px', padding: '40px', maxWidth: '400px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+              <h3 style={{ color: '#2c1a0e', fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>Limpar histórico?</h3>
+              <p style={{ color: '#7a5c3a', marginBottom: '24px' }}>Todos os registros serão removidos permanentemente. Essa ação não pode ser desfeita.</p>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setConfirmarLimpar(false)}
+                  style={{ flex: 1, background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={async () => { await api.delete('/logs'); setConfirmarLimpar(false); fetchLogs() }}
+                  style={{ flex: 1, background: '#c0392b', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}
+                >
+                  Limpar tudo
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

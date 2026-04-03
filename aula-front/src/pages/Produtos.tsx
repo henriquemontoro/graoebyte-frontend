@@ -15,11 +15,15 @@ export default function Produtos() {
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [busca, setBusca] = useState('')
   const [categoriaFiltro, setCategoriaFiltro] = useState('Todas')
+  const [disponivelFiltro, setDisponivelFiltro] = useState('Todos')
   const [view, setView] = useState<'cards' | 'tabela'>('cards')
+  const [modalDeletar, setModalDeletar] = useState<{id: string, nome: string} | null>(null)
+  const [ordemPreco, setOrdemPreco] = useState<'asc' | 'desc' | null>(null)
   const isAdmin = localStorage.getItem('role') === 'admin'
-  const [modoFuncionario, setModoFuncionario] = useState(localStorage.getItem('modoFuncionario') === 'true')
+  const modoFuncionario = localStorage.getItem('modoFuncionario') === 'true'
 
   const categorias = ['Todas', 'Bebidas Quentes', 'Bebidas Frias', 'Lanches', 'Doces', 'Outros']
+  const ordemCategorias = ['Bebidas Quentes', 'Bebidas Frias', 'Lanches', 'Doces', 'Outros']
 
   const fetchProdutos = async () => {
     const res = await api.get('/produtos')
@@ -27,9 +31,9 @@ export default function Produtos() {
   }
 
   const deletar = async (id: string) => {
-    if (!confirm('Deletar?')) return
     await api.delete(`/produtos/${id}`)
     fetchProdutos()
+    setModalDeletar(null)
   }
 
   const toggleDisponivel = async (id: string, disponivel: boolean) => {
@@ -39,29 +43,46 @@ export default function Produtos() {
 
   useEffect(() => { fetchProdutos() }, [])
 
-  const ordemCategorias = ['Bebidas Quentes', 'Bebidas Frias', 'Lanches', 'Doces', 'Outros']
-
-const produtosFiltrados = produtos
-  .filter(p => {
-    const matchBusca = p.nome.toLowerCase().includes(busca.toLowerCase()) || p.descricao.toLowerCase().includes(busca.toLowerCase())
-    const matchCategoria = categoriaFiltro === 'Todas' || p.categoria === categoriaFiltro
-    return matchBusca && matchCategoria
-  })
-  .sort((a, b) => {
-    const catA = ordemCategorias.indexOf(a.categoria) === -1 ? 99 : ordemCategorias.indexOf(a.categoria)
-    const catB = ordemCategorias.indexOf(b.categoria) === -1 ? 99 : ordemCategorias.indexOf(b.categoria)
-    if (catA !== catB) return catA - catB
-    return a.nome.localeCompare(b.nome)
-  })
+  const produtosFiltrados = produtos
+    .filter(p => {
+      const matchBusca = p.nome.toLowerCase().includes(busca.toLowerCase()) || p.descricao.toLowerCase().includes(busca.toLowerCase())
+      const matchCategoria = categoriaFiltro === 'Todas' || p.categoria === categoriaFiltro
+      const matchDisponivel = disponivelFiltro === 'Todos' || (disponivelFiltro === 'Disponíveis' ? p.disponivel : !p.disponivel)
+      return matchBusca && matchCategoria && matchDisponivel
+    })
+    .sort((a, b) => {
+      if (ordemPreco) return ordemPreco === 'asc' ? a.preco - b.preco : b.preco - a.preco
+      const catA = ordemCategorias.indexOf(a.categoria) === -1 ? 99 : ordemCategorias.indexOf(a.categoria)
+      const catB = ordemCategorias.indexOf(b.categoria) === -1 ? 99 : ordemCategorias.indexOf(b.categoria)
+      if (catA !== catB) return catA - catB
+      return a.nome.localeCompare(b.nome)
+    })
 
   const totalDisponiveis = produtos.filter(p => p.disponivel).length
   const totalIndisponiveis = produtos.filter(p => !p.disponivel).length
   const precoMedio = produtos.length > 0 ? produtos.reduce((acc, p) => acc + p.preco, 0) / produtos.length : 0
-
   const formatarData = (data: string) => new Date(data).toLocaleDateString('pt-BR')
+  const toggleOrdemPreco = () => {
+    if (ordemPreco === null) setOrdemPreco('asc')
+    else if (ordemPreco === 'asc') setOrdemPreco('desc')
+    else setOrdemPreco(null)
+  }
+  const iconePreco = ordemPreco === 'asc' ? '↑' : ordemPreco === 'desc' ? '↓' : '↕'
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#fdf6ee' }}>
+      {modalDeletar && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '16px', padding: '32px', maxWidth: '400px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ color: '#2c1a0e', fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>Deletar produto?</h3>
+            <p style={{ color: '#7a5c3a', marginBottom: '24px' }}>Tem certeza que deseja deletar <strong>{modalDeletar.nome}</strong>? Essa ação não pode ser desfeita.</p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={() => setModalDeletar(null)} style={{ flex: 1, background: '#f5f5f5', color: '#2c1a0e', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: '500' }}>Cancelar</button>
+              <button onClick={() => deletar(modalDeletar.id)} style={{ flex: 1, background: '#c0392b', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: '500' }}>Deletar</button>
+            </div>
+          </div>
+        </div>
+      )}
       <aside style={{ background: '#2c1a0e', width: '240px', minWidth: '240px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
         <div style={{ marginBottom: '40px' }}>
           <div style={{ marginBottom: '8px' }}>
@@ -76,37 +97,25 @@ const produtosFiltrados = produtos
             </span>
           )}
         </div>
-        <a href="/produtos" style={{ background: '#3d2510', color: '#f5c97a', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500' }}>
-          🧾 Produtos
-        </a>
+        <a href="/produtos" style={{ background: '#3d2510', color: '#f5c97a', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500' }}>🧾 Produtos</a>
         {isAdmin && !modoFuncionario && (
-          <a href="/usuarios" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
-            👤 Usuários
-          </a>
+          <a href="/usuarios" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>👤 Usuários</a>
         )}
         {isAdmin && !modoFuncionario && (
-          <a href="/historico" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
-            📋 Histórico
-          </a>
+          <a href="/historico" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>📋 Histórico</a>
         )}
         {isAdmin && !modoFuncionario && (
-          <button
-            onClick={() => { localStorage.setItem('modoFuncionario', 'true'); setModoFuncionario(true) }}
-            style={{ color: '#a07850', background: 'none', border: '1px solid #a07850', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}
-          >
+          <button onClick={() => { localStorage.setItem('modoFuncionario', 'true'); window.location.reload() }} style={{ color: '#a07850', background: 'none', border: '1px solid #a07850', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}>
             👁️ Ver como funcionário
           </button>
         )}
         {isAdmin && modoFuncionario && (
-          <button
-            onClick={() => { localStorage.removeItem('modoFuncionario'); setModoFuncionario(false) }}
-            style={{ color: '#f5c97a', background: '#3d2510', border: 'none', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}
-          >
+          <button onClick={() => { localStorage.removeItem('modoFuncionario'); window.location.reload() }} style={{ color: '#f5c97a', background: '#3d2510', border: 'none', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}>
             ← Sair da visualização
           </button>
         )}
         <div style={{ marginTop: 'auto' }}>
-          <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('role'); window.location.href = '/' }} style={{ color: '#a07850', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('role'); localStorage.removeItem('modoFuncionario'); window.location.href = '/' }} style={{ color: '#a07850', background: 'none', border: 'none', cursor: 'pointer' }}>
             → Sair
           </button>
         </div>
@@ -117,9 +126,7 @@ const produtosFiltrados = produtos
             <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#2c1a0e', margin: 0 }}>Produtos</h2>
             <p style={{ color: '#7a5c3a', margin: '4px 0 0' }}>{produtosFiltrados.length} itens encontrados</p>
           </div>
-          <a href="/produtos/novo" style={{ background: '#2c1a0e', color: '#f5c97a', padding: '12px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: '500', whiteSpace: 'nowrap' }}>
-            + Novo Produto
-          </a>
+          <a href="/produtos/novo" style={{ background: '#2c1a0e', color: '#f5c97a', padding: '12px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: '500', whiteSpace: 'nowrap' }}>+ Novo Produto</a>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
           <div style={{ background: 'white', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', borderTop: '4px solid #c8833b' }}>
@@ -139,25 +146,41 @@ const produtosFiltrados = produtos
             <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#c8833b', margin: 0 }}>R$ {precoMedio.toFixed(2)}</p>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', alignItems: 'flex-end' }}>
           <input
-            style={{ flex: 1, border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', boxSizing: 'border-box', background: 'white' }}
+            style={{ flex: 1, border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', boxSizing: 'border-box', background: 'white', height: '44px' }}
             placeholder="🔍 Buscar produto..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
-          <select
-            style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', background: 'white', cursor: 'pointer' }}
-            value={categoriaFiltro}
-            onChange={(e) => setCategoriaFiltro(e.target.value)}
-          >
-            {categorias.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-          <div style={{ display: 'flex', border: '1px solid #c8833b', borderRadius: '10px', overflow: 'hidden' }}>
-            <button onClick={() => setView('cards')} style={{ padding: '12px 16px', background: view === 'cards' ? '#2c1a0e' : 'white', color: view === 'cards' ? '#f5c97a' : '#2c1a0e', border: 'none', cursor: 'pointer', fontSize: '16px' }}>⊞</button>
-            <button onClick={() => setView('tabela')} style={{ padding: '12px 16px', background: view === 'tabela' ? '#2c1a0e' : 'white', color: view === 'tabela' ? '#f5c97a' : '#2c1a0e', border: 'none', cursor: 'pointer', fontSize: '16px' }}>☰</button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '10px', color: '#a07850', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Categoria</label>
+            <select
+              style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', background: 'white', cursor: 'pointer', height: '44px' }}
+              value={categoriaFiltro}
+              onChange={(e) => setCategoriaFiltro(e.target.value)}
+            >
+              {categorias.map((c) => (<option key={c} value={c}>{c}</option>))}
+            </select>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '10px', color: '#a07850', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Disponibilidade</label>
+            <select
+              style={{ border: '1px solid #c8833b', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', background: 'white', cursor: 'pointer', height: '44px' }}
+              value={disponivelFiltro}
+              onChange={(e) => setDisponivelFiltro(e.target.value)}
+            >
+              <option value="Todos">Todos</option>
+              <option value="Disponíveis">Disponíveis</option>
+              <option value="Indisponíveis">Indisponíveis</option>
+            </select>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '10px', color: '#a07850', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Visualização</label>
+            <div style={{ display: 'flex', border: '1px solid #c8833b', borderRadius: '10px', overflow: 'hidden', height: '44px' }}>
+              <button onClick={() => setView('cards')} style={{ padding: '0 16px', background: view === 'cards' ? '#2c1a0e' : 'white', color: view === 'cards' ? '#f5c97a' : '#2c1a0e', border: 'none', cursor: 'pointer', fontSize: '16px' }}>⊞</button>
+              <button onClick={() => setView('tabela')} style={{ padding: '0 16px', background: view === 'tabela' ? '#2c1a0e' : 'white', color: view === 'tabela' ? '#f5c97a' : '#2c1a0e', border: 'none', cursor: 'pointer', fontSize: '16px' }}>☰</button>
+            </div>
           </div>
         </div>
         {view === 'cards' && (
@@ -180,12 +203,8 @@ const produtosFiltrados = produtos
                   <button onClick={() => toggleDisponivel(p._id, p.disponivel)} style={{ flex: 1, background: p.disponivel ? '#fff3cd' : '#d4edda', color: p.disponivel ? '#856404' : '#155724', border: `1px solid ${p.disponivel ? '#ffc107' : '#28a745'}`, padding: '8px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}>
                     {p.disponivel ? '✕ Indisponível' : '✓ Disponível'}
                   </button>
-                  <a href={`/produtos/${p._id}/editar`} style={{ flex: 1, background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '8px', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', textAlign: 'center' }}>
-                    Editar
-                  </a>
-                  <button onClick={() => deletar(p._id)} style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}>
-                    🗑️
-                  </button>
+                  <a href={`/produtos/${p._id}/editar`} style={{ flex: 1, background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '8px', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', textAlign: 'center' }}>Editar</a>
+                  <button onClick={() => setModalDeletar({ id: p._id, nome: p.nome })} style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
                 </div>
               </div>
             ))}
@@ -198,7 +217,7 @@ const produtosFiltrados = produtos
                 <tr style={{ background: '#2c1a0e' }}>
                   <th style={{ padding: '14px 16px', textAlign: 'left', color: '#f5c97a', fontWeight: '600', fontSize: '13px' }}>Produto</th>
                   <th style={{ padding: '14px 16px', textAlign: 'left', color: '#f5c97a', fontWeight: '600', fontSize: '13px' }}>Categoria</th>
-                  <th style={{ padding: '14px 16px', textAlign: 'left', color: '#f5c97a', fontWeight: '600', fontSize: '13px' }}>Preço</th>
+                  <th onClick={toggleOrdemPreco} style={{ padding: '14px 16px', textAlign: 'left', color: '#f5c97a', fontWeight: '600', fontSize: '13px', cursor: 'pointer', userSelect: 'none' }}>Preço {iconePreco}</th>
                   <th style={{ padding: '14px 16px', textAlign: 'left', color: '#f5c97a', fontWeight: '600', fontSize: '13px' }}>Status</th>
                   <th style={{ padding: '14px 16px', textAlign: 'left', color: '#f5c97a', fontWeight: '600', fontSize: '13px' }}>Atualizado</th>
                   <th style={{ padding: '14px 16px', textAlign: 'left', color: '#f5c97a', fontWeight: '600', fontSize: '13px' }}>Ações</th>
@@ -222,20 +241,14 @@ const produtosFiltrados = produtos
                         {p.disponivel ? '● Disponível' : '● Indisponível'}
                       </span>
                     </td>
-                    <td style={{ padding: '14px 16px', borderBottom: '1px solid #f0e8dc', color: '#a07850', fontSize: '13px' }}>
-                      {formatarData(p.updatedAt)}
-                    </td>
+                    <td style={{ padding: '14px 16px', borderBottom: '1px solid #f0e8dc', color: '#a07850', fontSize: '13px' }}>{formatarData(p.updatedAt)}</td>
                     <td style={{ padding: '14px 16px', borderBottom: '1px solid #f0e8dc' }}>
                       <div style={{ display: 'flex', gap: '6px' }}>
                         <button onClick={() => toggleDisponivel(p._id, p.disponivel)} style={{ background: p.disponivel ? '#fff3cd' : '#d4edda', color: p.disponivel ? '#856404' : '#155724', border: `1px solid ${p.disponivel ? '#ffc107' : '#28a745'}`, padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', whiteSpace: 'nowrap' }}>
                           {p.disponivel ? '✕' : '✓'}
                         </button>
-                        <a href={`/produtos/${p._id}/editar`} style={{ background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '6px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '12px' }}>
-                          Editar
-                        </a>
-                        <button onClick={() => deletar(p._id)} style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}>
-                          🗑️
-                        </button>
+                        <a href={`/produtos/${p._id}/editar`} style={{ background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '6px 10px', borderRadius: '6px', textDecoration: 'none', fontSize: '12px' }}>Editar</a>
+                        <button onClick={() => setModalDeletar({ id: p._id, nome: p.nome })} style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
                       </div>
                     </td>
                   </tr>

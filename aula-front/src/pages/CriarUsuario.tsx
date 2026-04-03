@@ -13,7 +13,16 @@ export default function CriarUsuario() {
   const criar = async () => {
     const novosErros: {email?: string, senha?: string} = {}
     if (!email.trim()) novosErros.email = 'Email é obrigatório'
-    if (!senha.trim()) novosErros.senha = 'Senha é obrigatória'
+    if (!senha.trim()) {
+      novosErros.senha = 'Senha é obrigatória'
+    } else {
+      const errosSenha = []
+      if (senha.length < 8) errosSenha.push('mínimo 8 caracteres')
+      if (!/[A-Z]/.test(senha)) errosSenha.push('1 letra maiúscula')
+      if (!/[0-9]/.test(senha)) errosSenha.push('1 número')
+      if (!/[^A-Za-z0-9]/.test(senha)) errosSenha.push('1 símbolo')
+      if (errosSenha.length > 0) novosErros.senha = `Senha deve ter: ${errosSenha.join(', ')}`
+}
     if (Object.keys(novosErros).length > 0) {
       setErros(novosErros)
       return
@@ -47,7 +56,7 @@ export default function CriarUsuario() {
           🧾 Produtos
         </a>
         {isAdmin && !modoFuncionario && (
-          <a href="/usuarios" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
+          <a href="/usuarios" style={{ background: '#3d2510', color: '#f5c97a', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>
             👤 Usuários
           </a>
         )}

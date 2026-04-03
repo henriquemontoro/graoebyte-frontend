@@ -10,6 +10,7 @@ interface Usuario {
 export default function Usuarios() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [erro, setErro] = useState('')
+  const [confirmarDeletar, setConfirmarDeletar] = useState<string | null>(null)
   const isAdmin = localStorage.getItem('role') === 'admin'
   const modoFuncionario = localStorage.getItem('modoFuncionario') === 'true'
 
@@ -23,9 +24,9 @@ export default function Usuarios() {
   }
 
   const deletar = async (id: string) => {
-    if (!confirm('Deletar usuário?')) return
     await api.delete(`/usuarios/${id}`)
     fetchUsuarios()
+    setConfirmarDeletar(null)
   }
 
   const alterarRole = async (id: string, role: string) => {
@@ -121,7 +122,7 @@ export default function Usuarios() {
                   <option value="admin">Admin</option>
                 </select>
                 <button
-                  onClick={() => deletar(u._id)}
+                  onClick={() => setConfirmarDeletar(u._id)}
                   style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}
                 >
                   Deletar
@@ -130,6 +131,28 @@ export default function Usuarios() {
             </div>
           ))}
         </div>
+        {confirmarDeletar && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div style={{ background: 'white', borderRadius: '20px', padding: '40px', maxWidth: '400px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+              <h3 style={{ color: '#2c1a0e', fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>Deletar usuário?</h3>
+              <p style={{ color: '#7a5c3a', marginBottom: '24px' }}>Essa ação não pode ser desfeita.</p>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setConfirmarDeletar(null)}
+                  style={{ flex: 1, background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => deletar(confirmarDeletar)}
+                  style={{ flex: 1, background: '#c0392b', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}
+                >
+                  Deletar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
