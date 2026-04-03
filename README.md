@@ -40,8 +40,8 @@ Acesse: http://localhost:5173
 ### Produtos
 - Listagem em cards ou tabela
 - Métricas: total, disponíveis, indisponíveis, preço médio
+- Botões de categoria clicáveis com contador de disponibilidade
 - Busca por nome ou descrição
-- Filtro por categoria
 - Filtro por disponibilidade
 - Ordenação clicável por preço na tabela
 - Ordenação padrão por categoria e nome alfabético
@@ -49,18 +49,20 @@ Acesse: http://localhost:5173
 - Marcar produto como disponível/indisponível
 - Criar, editar e deletar produtos
 - Validação de campos obrigatórios
+- Nomes de produtos únicos
 - Modal de confirmação ao deletar
 
 ### Usuários (Admin)
-- Listar, criar e deletar usuários
+- Listar, criar, editar e deletar usuários
 - Alterar role (admin/funcionário)
 - Proteção contra remoção do único admin
 - Validação de senha: mínimo 8 caracteres, 1 maiúscula, 1 número, 1 símbolo
+- Nomes e emails únicos por usuário
 - Modal de confirmação ao deletar
-- Botão de mostrar/ocultar senha
 
 ### Histórico (Admin)
-- Registro de todas as ações no sistema
+- Registro detalhado de ações: adicionou, editou, marcou disponível/indisponível, removeu produto
+- Exibe nome do usuário em vez de email
 - Data e hora em horário de Brasília
 - Limpar histórico com modal de confirmação
 
