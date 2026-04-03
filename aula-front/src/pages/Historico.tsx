@@ -41,8 +41,8 @@ export default function Historico() {
           </div>
           <p style={{ color: '#a07850', fontSize: '12px', marginBottom: '8px' }}>Sistema de Gestão</p>
           {isAdmin && (
-            <span style={{ fontSize: '11px', background: '#f0d080', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
-              ⭐ Admin
+            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', border: 'none', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
+              Admin
             </span>
           )}
         </div>
