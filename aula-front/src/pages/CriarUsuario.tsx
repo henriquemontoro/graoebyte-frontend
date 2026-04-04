@@ -257,7 +257,7 @@ export default function CriarUsuario() {
             <LogoSpan color="#c8833b">Byte</LogoSpan>
           </LogoRow>
           <SubText>Sistema de Gestão</SubText>
-          {isAdmin && <AdminBadge>{modoFuncionario ? '👁️ Modo Funcionário' : '⭐ Admin'}</AdminBadge>}
+          {isAdmin && <AdminBadge>{modoFuncionario ? '👁️ Modo Funcionário' : 'Admin'}</AdminBadge>}
         </LogoWrapper>
         <NavLink href="/produtos">🧾 Produtos</NavLink>
         {isAdmin && !modoFuncionario && <NavLink href="/usuarios" ativo>👤 Usuários</NavLink>}

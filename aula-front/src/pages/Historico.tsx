@@ -239,7 +239,7 @@ export default function Historico() {
             <LogoSpan color="#c8833b">Byte</LogoSpan>
           </LogoRow>
           <SubText>Sistema de Gestão</SubText>
-          {isAdmin && <AdminBadge>⭐ Admin</AdminBadge>}
+          {isAdmin && <AdminBadge>Admin</AdminBadge>}
         </LogoWrapper>
         <NavLink href="/produtos">🧾 Produtos</NavLink>
         {isAdmin && <NavLink href="/usuarios">👤 Usuários</NavLink>}

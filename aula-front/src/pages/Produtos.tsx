@@ -560,7 +560,7 @@ export default function Produtos() {
           </LogoRow>
           <SubText>Sistema de Gestão</SubText>
           {isAdmin && (
-            <AdminBadge>{modoFuncionario ? '👁️ Modo Funcionário' : '⭐ Admin'}</AdminBadge>
+            <AdminBadge>{modoFuncionario ? '👁️ Modo Funcionário' : 'Admin'}</AdminBadge>
           )}
         </LogoWrapper>
         <NavLink href="/produtos" ativo>🧾 Produtos</NavLink>
