@@ -1,5 +1,156 @@
 import { useState } from 'react'
+import styled from 'styled-components'
 import api from '../config/api'
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  display: flex;
+  background: #2c1a0e;
+`
+
+const LeftPanel = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px;
+  background: linear-gradient(135deg, #2c1a0e 0%, #4a2c14 100%);
+`
+
+const LogoRow = styled.div`
+  margin-bottom: 48px;
+`
+
+const LogoSpan = styled.span<{ color: string }>`
+  color: ${p => p.color};
+  font-size: 48px;
+  font-weight: bold;
+`
+
+const Tagline = styled.p`
+  color: #a07850;
+  font-size: 18px;
+  line-height: 1.8;
+  max-width: 400px;
+`
+
+const FeatureList = styled.div`
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`
+
+const FeatureItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`
+
+const FeatureText = styled.span`
+  color: #c8833b;
+  font-size: 15px;
+`
+
+const RightPanel = styled.div`
+  width: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: #fdf6ee;
+`
+
+const FormWrapper = styled.div`
+  width: 100%;
+`
+
+const Title = styled.h2`
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c1a0e;
+  margin-bottom: 8px;
+`
+
+const Subtitle = styled.p`
+  color: #7a5c3a;
+  font-size: 14px;
+  margin-bottom: 32px;
+`
+
+const ErroMsg = styled.p`
+  color: #c0392b;
+  font-size: 14px;
+  margin-bottom: 16px;
+  background: #fff0f0;
+  padding: 12px;
+  border-radius: 8px;
+`
+
+const FormGroup = styled.div`
+  margin-bottom: 16px;
+`
+
+const FormGroupLast = styled.div`
+  margin-bottom: 32px;
+`
+
+const Label = styled.label`
+  display: block;
+  color: #2c1a0e;
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 14px;
+`
+
+const Input = styled.input`
+  width: 100%;
+  border: 1px solid #c8833b;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  background: white;
+  box-sizing: border-box;
+`
+
+const SenhaWrapper = styled.div`
+  position: relative;
+`
+
+const SenhaInput = styled.input`
+  width: 100%;
+  border: 1px solid #c8833b;
+  border-radius: 8px;
+  padding: 12px;
+  padding-right: 48px;
+  font-size: 14px;
+  background: white;
+  box-sizing: border-box;
+`
+
+const MostrarSenhaBtn = styled.button`
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #7a5c3a;
+  font-size: 14px;
+`
+
+const EntrarBtn = styled.button`
+  width: 100%;
+  background: #2c1a0e;
+  color: #f5c97a;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+`
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -21,65 +172,55 @@ export default function Login() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: '#2c1a0e' }}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '64px', background: 'linear-gradient(135deg, #2c1a0e 0%, #4a2c14 100%)' }}>
-        <div style={{ marginBottom: '48px' }}>
-          <span style={{ color: '#f5c97a', fontSize: '48px', fontWeight: 'bold' }}>Grão</span>
-          <span style={{ color: 'white', fontSize: '48px', fontWeight: 'bold' }}> & </span>
-          <span style={{ color: '#c8833b', fontSize: '48px', fontWeight: 'bold' }}>Byte</span>
-        </div>
-        <p style={{ color: '#a07850', fontSize: '18px', lineHeight: '1.8', maxWidth: '400px' }}>
-          Sistema de gestão interna para controle de produtos, cardápio e equipe da cafeteria.
-        </p>
-        <div style={{ marginTop: '48px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <PageWrapper>
+      <LeftPanel>
+        <LogoRow>
+          <LogoSpan color="#f5c97a">Grão</LogoSpan>
+          <LogoSpan color="white"> & </LogoSpan>
+          <LogoSpan color="#c8833b">Byte</LogoSpan>
+        </LogoRow>
+        <Tagline>Sistema de gestão interna para controle de produtos, cardápio e equipe da cafeteria.</Tagline>
+        <FeatureList>
+          <FeatureItem>
             <span style={{ fontSize: '24px' }}>🧾</span>
-            <span style={{ color: '#c8833b', fontSize: '15px' }}>Gestão completa de produtos e cardápio</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <FeatureText>Gestão completa de produtos e cardápio</FeatureText>
+          </FeatureItem>
+          <FeatureItem>
             <span style={{ fontSize: '24px' }}>👥</span>
-            <span style={{ color: '#c8833b', fontSize: '15px' }}>Controle de acesso por funcionário</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <FeatureText>Controle de acesso por funcionário</FeatureText>
+          </FeatureItem>
+          <FeatureItem>
             <span style={{ fontSize: '24px' }}>📋</span>
-            <span style={{ color: '#c8833b', fontSize: '15px' }}>Histórico completo de alterações</span>
-          </div>
-        </div>
-      </div>
-      <div style={{ width: '480px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '48px', background: '#fdf6ee' }}>
-        <div style={{ width: '100%' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2c1a0e', marginBottom: '8px' }}>Bem-vindo de volta</h2>
-          <p style={{ color: '#7a5c3a', fontSize: '14px', marginBottom: '32px' }}>Entre com suas credenciais para acessar o sistema</p>
-          {erro && <p style={{ color: '#c0392b', fontSize: '14px', marginBottom: '16px', background: '#fff0f0', padding: '12px', borderRadius: '8px' }}>{erro}</p>}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Email</label>
-            <input
-              style={{ width: '100%', border: '1px solid #c8833b', borderRadius: '8px', padding: '12px', fontSize: '14px', background: 'white', boxSizing: 'border-box' }}
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div style={{ marginBottom: '32px' }}>
-            <label style={{ display: 'block', color: '#2c1a0e', fontWeight: '600', marginBottom: '6px', fontSize: '14px' }}>Senha</label>
-            <div style={{ position: 'relative' }}>
-              <input
-                style={{ width: '100%', border: '1px solid #c8833b', borderRadius: '8px', padding: '12px', paddingRight: '48px', fontSize: '14px', background: 'white', boxSizing: 'border-box' }}
+            <FeatureText>Histórico completo de alterações</FeatureText>
+          </FeatureItem>
+        </FeatureList>
+      </LeftPanel>
+      <RightPanel>
+        <FormWrapper>
+          <Title>Bem-vindo de volta</Title>
+          <Subtitle>Entre com suas credenciais para acessar o sistema</Subtitle>
+          {erro && <ErroMsg>{erro}</ErroMsg>}
+          <FormGroup>
+            <Label>Email</Label>
+            <Input placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </FormGroup>
+          <FormGroupLast>
+            <Label>Senha</Label>
+            <SenhaWrapper>
+              <SenhaInput
                 placeholder="••••••••"
                 type={mostrarSenha ? 'text' : 'password'}
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
               />
-              <button onClick={() => setMostrarSenha(!mostrarSenha)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#7a5c3a', fontSize: '14px' }}>
+              <MostrarSenhaBtn onClick={() => setMostrarSenha(!mostrarSenha)}>
                 {mostrarSenha ? '🙈' : '👁️'}
-              </button>
-            </div>
-          </div>
-          <button onClick={handleLogin} style={{ width: '100%', background: '#2c1a0e', color: '#f5c97a', padding: '14px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>
-            Entrar
-          </button>
-        </div>
-      </div>
-    </div>
+              </MostrarSenhaBtn>
+            </SenhaWrapper>
+          </FormGroupLast>
+          <EntrarBtn onClick={handleLogin}>Entrar</EntrarBtn>
+        </FormWrapper>
+      </RightPanel>
+    </PageWrapper>
   )
 }

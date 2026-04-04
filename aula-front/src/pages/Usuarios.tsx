@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import styled from 'styled-components'
 import api from '../config/api'
 
 interface Usuario {
@@ -7,6 +8,251 @@ interface Usuario {
   email: string
   role: string
 }
+
+const PageWrapper = styled.div`
+  min-height: 100vh;
+  display: flex;
+  background: #fdf6ee;
+`
+
+const Sidebar = styled.aside`
+  background: #2c1a0e;
+  width: 240px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+`
+
+const LogoWrapper = styled.div`
+  margin-bottom: 40px;
+`
+
+const LogoRow = styled.div`
+  margin-bottom: 8px;
+`
+
+const LogoSpan = styled.span<{ color: string }>`
+  color: ${p => p.color};
+  font-size: 22px;
+  font-weight: bold;
+`
+
+const SubText = styled.p`
+  color: #a07850;
+  font-size: 12px;
+  margin-bottom: 8px;
+`
+
+const AdminBadge = styled.span`
+  font-size: 11px;
+  background: #f5c97a;
+  color: #2c1a0e;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+`
+
+const NavLink = styled.a<{ ativo?: boolean }>`
+  background: ${p => p.ativo ? '#3d2510' : 'none'};
+  color: ${p => p.ativo ? '#f5c97a' : '#a07850'};
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: ${p => p.ativo ? '0' : '8px'};
+`
+
+const NavButton = styled.button<{ ativo?: boolean }>`
+  color: ${p => p.ativo ? '#f5c97a' : '#a07850'};
+  background: ${p => p.ativo ? '#3d2510' : 'none'};
+  border: ${p => p.ativo ? 'none' : '1px solid #a07850'};
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-top: 8px;
+  text-align: left;
+`
+
+const SairButton = styled.button`
+  color: #a07850;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: auto;
+`
+
+const Main = styled.main`
+  flex: 1;
+  padding: 32px;
+`
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+`
+
+const Title = styled.h2`
+  font-size: 28px;
+  font-weight: bold;
+  color: #2c1a0e;
+`
+
+const Subtitle = styled.p`
+  color: #7a5c3a;
+`
+
+const NovoBtn = styled.a`
+  background: #2c1a0e;
+  color: #f5c97a;
+  padding: 12px 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 500;
+`
+
+const ErroMsg = styled.p`
+  color: #c0392b;
+  margin-bottom: 16px;
+  background: #fff0f0;
+  padding: 12px;
+  border-radius: 8px;
+`
+
+const Lista = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`
+
+const UsuarioCard = styled.div`
+  background: white;
+  border-left: 4px solid #c8833b;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+`
+
+const UsuarioInfo = styled.div``
+
+const UsuarioNome = styled.h3`
+  font-weight: bold;
+  font-size: 16px;
+  color: #2c1a0e;
+  margin: 0 0 4px;
+`
+
+const UsuarioEmail = styled.p`
+  color: #7a5c3a;
+  font-size: 13px;
+  margin: 0 0 6px;
+`
+
+const RoleBadge = styled.span<{ admin: boolean }>`
+  font-size: 12px;
+  background: ${p => p.admin ? '#f5c97a' : '#e8e8e8'};
+  color: #2c1a0e;
+  padding: 2px 8px;
+  border-radius: 20px;
+`
+
+const Acoes = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`
+
+const RoleSelect = styled.select`
+  border: 1px solid #c8833b;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 14px;
+  cursor: pointer;
+`
+
+const EditarLink = styled.a`
+  background: #fdf6ee;
+  color: #2c1a0e;
+  border: 1px solid #c8833b;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+`
+
+const DeletarBtn = styled.button`
+  background: #fff0f0;
+  color: #c0392b;
+  border: 1px solid #c0392b;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+`
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`
+
+const ModalBox = styled.div`
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+`
+
+const ModalTitle = styled.h3`
+  color: #2c1a0e;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+`
+
+const ModalText = styled.p`
+  color: #7a5c3a;
+  margin-bottom: 24px;
+`
+
+const ModalActions = styled.div`
+  display: flex;
+  gap: 12px;
+`
+
+const ModalCancelarBtn = styled.button`
+  flex: 1;
+  background: #fdf6ee;
+  color: #2c1a0e;
+  border: 1px solid #c8833b;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+`
+
+const ModalConfirmarBtn = styled.button`
+  flex: 1;
+  background: #c0392b;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+`
 
 export default function Usuarios() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
@@ -41,91 +287,75 @@ export default function Usuarios() {
   useEffect(() => { fetchUsuarios() }, [])
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', background: '#fdf6ee' }}>
-      <aside style={{ background: '#2c1a0e', width: '240px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ marginBottom: '40px' }}>
-          <div style={{ marginBottom: '8px' }}>
-            <span style={{ color: '#f5c97a', fontSize: '22px', fontWeight: 'bold' }}>Grão</span>
-            <span style={{ color: 'white', fontSize: '22px', fontWeight: 'bold' }}> & </span>
-            <span style={{ color: '#c8833b', fontSize: '22px', fontWeight: 'bold' }}>Byte</span>
-          </div>
-          <p style={{ color: '#a07850', fontSize: '12px', marginBottom: '8px' }}>Sistema de Gestão</p>
-          {isAdmin && (
-            <span style={{ fontSize: '11px', background: '#f5c97a', color: '#2c1a0e', padding: '3px 10px', borderRadius: '20px', fontWeight: '700', letterSpacing: '0.3px' }}>
-              {modoFuncionario ? '👁️ Modo Funcionário' : 'Admin'}
-            </span>
-          )}
-        </div>
-        <a href="/produtos" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500' }}>🧾 Produtos</a>
+    <PageWrapper>
+      <Sidebar>
+        <LogoWrapper>
+          <LogoRow>
+            <LogoSpan color="#f5c97a">Grão</LogoSpan>
+            <LogoSpan color="white"> & </LogoSpan>
+            <LogoSpan color="#c8833b">Byte</LogoSpan>
+          </LogoRow>
+          <SubText>Sistema de Gestão</SubText>
+          {isAdmin && <AdminBadge>{modoFuncionario ? '👁️ Modo Funcionário' : '⭐ Admin'}</AdminBadge>}
+        </LogoWrapper>
+        <NavLink href="/produtos">🧾 Produtos</NavLink>
+        {isAdmin && !modoFuncionario && <NavLink href="/usuarios" ativo>👤 Usuários</NavLink>}
+        {isAdmin && !modoFuncionario && <NavLink href="/historico">📋 Histórico</NavLink>}
         {isAdmin && !modoFuncionario && (
-          <a href="/usuarios" style={{ background: '#3d2510', color: '#f5c97a', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>👤 Usuários</a>
-        )}
-        {isAdmin && !modoFuncionario && (
-          <a href="/historico" style={{ color: '#a07850', padding: '12px 16px', borderRadius: '8px', textDecoration: 'none', fontWeight: '500', marginTop: '8px' }}>📋 Histórico</a>
-        )}
-        {isAdmin && !modoFuncionario && (
-          <button onClick={() => { localStorage.setItem('modoFuncionario', 'true'); window.location.href = '/produtos' }} style={{ color: '#a07850', background: 'none', border: '1px solid #a07850', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}>
+          <NavButton onClick={() => { localStorage.setItem('modoFuncionario', 'true'); window.location.href = '/produtos' }}>
             👁️ Ver como funcionário
-          </button>
+          </NavButton>
         )}
         {isAdmin && modoFuncionario && (
-          <button onClick={() => { localStorage.removeItem('modoFuncionario'); window.location.href = '/produtos' }} style={{ color: '#f5c97a', background: '#3d2510', border: 'none', borderRadius: '8px', padding: '10px 16px', cursor: 'pointer', fontSize: '13px', marginTop: '8px', textAlign: 'left' }}>
+          <NavButton ativo onClick={() => { localStorage.removeItem('modoFuncionario'); window.location.href = '/produtos' }}>
             ← Sair da visualização
-          </button>
+          </NavButton>
         )}
-        <div style={{ marginTop: 'auto' }}>
-          <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('role'); localStorage.removeItem('modoFuncionario'); window.location.href = '/' }} style={{ color: '#a07850', background: 'none', border: 'none', cursor: 'pointer' }}>
-            → Sair
-          </button>
-        </div>
-      </aside>
-      <main style={{ flex: 1, padding: '32px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <SairButton onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('role'); localStorage.removeItem('modoFuncionario'); window.location.href = '/' }}>
+          → Sair
+        </SairButton>
+      </Sidebar>
+      <Main>
+        <Header>
           <div>
-            <h2 style={{ fontSize: '28px', fontWeight: 'bold', color: '#2c1a0e' }}>Usuários</h2>
-            <p style={{ color: '#7a5c3a' }}>{usuarios.length} usuários cadastrados</p>
+            <Title>Usuários</Title>
+            <Subtitle>{usuarios.length} usuários cadastrados</Subtitle>
           </div>
-          <a href="/usuarios/novo" style={{ background: '#2c1a0e', color: '#f5c97a', padding: '12px 20px', borderRadius: '12px', textDecoration: 'none', fontWeight: '500' }}>+ Novo Usuário</a>
-        </div>
-        {erro && <p style={{ color: '#c0392b', marginBottom: '16px', background: '#fff0f0', padding: '12px', borderRadius: '8px' }}>{erro}</p>}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <NovoBtn href="/usuarios/novo">+ Novo Usuário</NovoBtn>
+        </Header>
+        {erro && <ErroMsg>{erro}</ErroMsg>}
+        <Lista>
           {usuarios.map((u) => (
-            <div key={u._id} style={{ background: 'white', borderLeft: '4px solid #c8833b', borderRadius: '12px', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
-              <div>
-                <h3 style={{ fontWeight: 'bold', fontSize: '16px', color: '#2c1a0e', margin: '0 0 4px' }}>{u.nome}</h3>
-                <p style={{ color: '#7a5c3a', fontSize: '13px', margin: '0 0 6px' }}>{u.email}</p>
-                <span style={{ fontSize: '12px', background: u.role === 'admin' ? '#f5c97a' : '#e8e8e8', color: '#2c1a0e', padding: '2px 8px', borderRadius: '20px' }}>
-                  {u.role}
-                </span>
-              </div>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <select value={u.role} onChange={(e) => alterarRole(u._id, e.target.value)} style={{ border: '1px solid #c8833b', borderRadius: '8px', padding: '8px', fontSize: '14px', cursor: 'pointer' }}>
+            <UsuarioCard key={u._id}>
+              <UsuarioInfo>
+                <UsuarioNome>{u.nome}</UsuarioNome>
+                <UsuarioEmail>{u.email}</UsuarioEmail>
+                <RoleBadge admin={u.role === 'admin'}>{u.role}</RoleBadge>
+              </UsuarioInfo>
+              <Acoes>
+                <RoleSelect value={u.role} onChange={(e) => alterarRole(u._id, e.target.value)}>
                   <option value="funcionario">Funcionário</option>
                   <option value="admin">Admin</option>
-                </select>
-                <a href={`/usuarios/${u._id}/editar`} style={{ background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '8px 16px', borderRadius: '8px', textDecoration: 'none', fontSize: '14px' }}>
-                  Editar
-                </a>
-                <button onClick={() => setConfirmarDeletar(u._id)} style={{ background: '#fff0f0', color: '#c0392b', border: '1px solid #c0392b', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>
-                  Deletar
-                </button>
-              </div>
-            </div>
+                </RoleSelect>
+                <EditarLink href={`/usuarios/${u._id}/editar`}>Editar</EditarLink>
+                <DeletarBtn onClick={() => setConfirmarDeletar(u._id)}>Deletar</DeletarBtn>
+              </Acoes>
+            </UsuarioCard>
           ))}
-        </div>
+        </Lista>
         {confirmarDeletar && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-            <div style={{ background: 'white', borderRadius: '20px', padding: '40px', maxWidth: '400px', width: '90%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
-              <h3 style={{ color: '#2c1a0e', fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>Deletar usuário?</h3>
-              <p style={{ color: '#7a5c3a', marginBottom: '24px' }}>Essa ação não pode ser desfeita.</p>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => setConfirmarDeletar(null)} style={{ flex: 1, background: '#fdf6ee', color: '#2c1a0e', border: '1px solid #c8833b', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}>Cancelar</button>
-                <button onClick={() => deletar(confirmarDeletar)} style={{ flex: 1, background: '#c0392b', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: '500' }}>Deletar</button>
-              </div>
-            </div>
-          </div>
+          <ModalOverlay>
+            <ModalBox>
+              <ModalTitle>Deletar usuário?</ModalTitle>
+              <ModalText>Essa ação não pode ser desfeita.</ModalText>
+              <ModalActions>
+                <ModalCancelarBtn onClick={() => setConfirmarDeletar(null)}>Cancelar</ModalCancelarBtn>
+                <ModalConfirmarBtn onClick={() => deletar(confirmarDeletar)}>Deletar</ModalConfirmarBtn>
+              </ModalActions>
+            </ModalBox>
+          </ModalOverlay>
         )}
-      </main>
-    </div>
+      </Main>
+    </PageWrapper>
   )
 }
